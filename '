@@ -1,0 +1,28 @@
+use wasm_bindgen::prelude::wasm_bindgen;
+pub mod session;
+pub mod types;
+use session::Session;
+
+#[wasm_bindgen]
+pub struct SessionManager {
+    session: Session,
+}
+
+#[wasm_bindgen]
+impl SessionManager {
+    #[wasm_bindgen(constructor)]
+    pub fn new() -> Self {
+        Self {
+            session: Session::new(10),
+        }
+    }
+    #[wasm_bindgen]
+    pub fn ask(&mut self, prompt: &str) {
+        self.session.ask_string(prompt);
+    }
+    #[wasm_bindgen]
+    pub fn add_reply(&mut self, parts: &str) {
+        let parts: Vec<Part> = serde_json::from_str(parts).unwrap();
+        self.session.reply(parts);
+    }
+}
