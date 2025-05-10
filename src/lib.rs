@@ -1,13 +1,9 @@
-pub mod parser;
 pub mod request;
 pub mod response;
 pub mod session;
 
-use parser::MarkdownToParts;
-use regex::Regex;
 use request::Part;
 use session::Session;
-use std::str::FromStr;
 use wasm_bindgen::prelude::wasm_bindgen;
 
 #[wasm_bindgen]
@@ -22,20 +18,6 @@ impl SessionManager {
         Self {
             session: Session::new(10),
         }
-    }
-    #[wasm_bindgen]
-    pub async fn to_parts(prompt: &str) -> String {
-        let regex = Regex::from_str(r"(?s)!\[.*?].?\((.*?)\)|https?://([^\s]+\.pdf)\b").unwrap();
-        let parser = MarkdownToParts::from_regex(prompt, regex, |url| {
-            let extention = url.split(".").last().unwrap();
-            if extention.to_lowercase() == "pdf" {
-                "application/pdf".into()
-            } else {
-                format!("image/{extention}")
-            }
-        })
-        .await;
-        serde_json::to_string(&parser.process()).unwrap()
     }
     #[wasm_bindgen]
     pub fn ask(&mut self, parts: &str) {
