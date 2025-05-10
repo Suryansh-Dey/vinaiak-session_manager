@@ -11,7 +11,7 @@ getset = "0.1.5"
 derive-new = "0.7.0"
 regex = "1.11.1"
 base64 = "0.22.1"
-reqwest = "0.12.15"
+gloo-net = "0.6"
 futures = "0.3.31"
 wasm-bindgen-futures = "0.4.50"
 

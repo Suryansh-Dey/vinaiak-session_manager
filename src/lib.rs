@@ -2,12 +2,12 @@ pub mod parser;
 pub mod request;
 pub mod response;
 pub mod session;
-use std::str::FromStr;
 
 use parser::MarkdownToParts;
 use regex::Regex;
 use request::Part;
 use session::Session;
+use std::str::FromStr;
 use wasm_bindgen::prelude::wasm_bindgen;
 
 #[wasm_bindgen]

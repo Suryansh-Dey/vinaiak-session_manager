@@ -1,7 +1,7 @@
 use base64::{Engine, engine::general_purpose::STANDARD};
 use futures::future::join_all;
+use gloo_net::http::Request;
 use regex::Regex;
-use reqwest::Client;
 
 pub struct MatchedFiles {
     pub index: usize,
@@ -19,7 +19,6 @@ pub async fn get_file_base64s(
     regex: Regex,
     guess_mime_type: fn(url: &str) -> String,
 ) -> Vec<MatchedFiles> {
-    let client = Client::new();
     let mut tasks: Vec<_> = Vec::new();
 
     for file in regex.captures_iter(markdown.as_ref()) {
@@ -27,18 +26,18 @@ pub async fn get_file_base64s(
         let url = file[1].to_string();
         tasks.push((async |capture: regex::Match<'_>, url: String| {
             let (mime_type, base64) = if url.starts_with("https://") || url.starts_with("http://") {
-                let response = client.get(&url).send().await;
+                println!("trying to make request to {url}");
+                let response = Request::get(&url).send().await;
+                println!("Done!");
                 match response {
                     Ok(response) => {
                         let mime_type = response
                             .headers()
                             .get("Content-Type")
-                            .map(|mime| mime.to_str().ok())
-                            .flatten()
-                            .map(|str| str.to_string());
+                            .map(|mime| mime.to_string());
 
                         let base64 = response
-                            .bytes()
+                            .binary()
                             .await
                             .ok()
                             .map(|bytes| STANDARD.encode(bytes));
@@ -51,7 +50,7 @@ pub async fn get_file_base64s(
                     Err(_) => (None, None),
                 }
             } else {
-                println!("Ignored file path url: {url}");
+                println!("Ignored file path url in WASM: {url}");
                 (None, None)
             };
             MatchedFiles {
@@ -86,6 +85,7 @@ impl<'a> MarkdownToParts<'a> {
         regex: Regex,
         guess_mime_type: fn(url: &str) -> String,
     ) -> Self {
+        println!("Dikh rha hai?");
         Self {
             base64s: get_file_base64s(markdown, regex, guess_mime_type).await,
             markdown,
