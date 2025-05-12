@@ -33,4 +33,8 @@ impl SessionManager {
     pub fn get_session(&self) -> String {
         serde_json::to_string(&self.session).unwrap()
     }
+    #[wasm_bindgen]
+    pub fn get_last_reply(&self) -> String {
+        self.session.get_last_message_text("").unwrap()
+    }
 }
