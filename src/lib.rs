@@ -21,16 +21,20 @@ impl SessionManager {
     }
     #[wasm_bindgen]
     pub fn ask(&mut self, parts: &str) {
-        let parts: Vec<Part> = serde_json::from_str(parts).unwrap_or_else(|error| {
+        let parts: Vec<Part> = serde_json::from_str(parts).unwrap_or_else(|_| {
             vec![Part::text(
-                format!("Error: Invalid response from server\n{error}").into(),
+                format!("Error1: Invalid response from server\n{parts}").into(),
             )]
         });
         self.session.ask(parts);
     }
     #[wasm_bindgen]
     pub fn add_reply(&mut self, parts: &str) {
-        let parts: Vec<Part> = serde_json::from_str(parts).unwrap();
+        let parts: Vec<Part> = serde_json::from_str(parts).unwrap_or_else(|_| {
+            vec![Part::text(
+                format!("Error2: Invalid response from server\n{parts}").into(),
+            )]
+        });
         self.session.reply(parts);
     }
     #[wasm_bindgen]
